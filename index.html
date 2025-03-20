@@ -14,9 +14,9 @@
         <p>Digite o CNPJ da empresa (apenas números):</p>
         <div class="input-group">
             <input type="text" id="cnpj" placeholder="Digite o CNPJ" maxlength="14" />
-            <button onclick="consultarCNPJ()">Consultar</button>
+            <button id="consultar">Consultar</button>
         </div>
-
+        <div id="loading" class="loading">Carregando...</div>
         <div id="result" class="result">
             <h3>Dados da Empresa:</h3>
             <p><strong>Nome:</strong> <span id="nome"></span></p>
@@ -24,10 +24,8 @@
             <p><strong>Situação:</strong> <span id="situacao"></span></p>
             <p><strong>Atividade Principal:</strong> <span id="atividade"></span></p>
         </div>
-
-        <div id="error" class="error" style="display: none;"></div>
+        <div id="error" class="error"></div>
     </div>
-
     <script src="script.js"></script>
 </body>
 
