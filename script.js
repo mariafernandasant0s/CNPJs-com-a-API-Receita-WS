@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
   async function consultarCNPJ() {
     const cnpj = cnpjInput.value.trim();
 
-    // Limpa mensagens anteriores
     resultDiv.style.display = 'none';
     errorDiv.style.display = 'none';
 
@@ -22,28 +21,31 @@ document.addEventListener('DOMContentLoaded', () => {
     exibirLoading();
 
     try {
-      const response = await fetch(
-        `https://api.allorigins.win/raw?url=https://receitaws.com.br/v1/cnpj/${cnpj}`,
-        {
-          headers: {
-            Accept: 'application/json',
-          },
-        }
-      );
+      const response = await fetch(`https://receitaws.com.br/v1/cnpj/${cnpj}`, {
+        headers: {
+          Accept: 'application/json',
+        },
+      });
 
       ocultarLoading();
 
       if (!response.ok) {
-
-        if (response.status === 429) {
-          exibirErro('Limite de requisições excedido. Tente novamente mais tarde.');
-        } else if (response.status === 404) {
-
-          exibirErro('CNPJ não encontrado.');
-
-        }
-        else {
-          exibirErro(`Erro na requisição: ${response.status} - ${response.statusText}`);
+        console.error(`Erro na requisição: ${response.status} - ${response.statusText}`);
+        switch (response.status) {
+          case 404:
+            exibirErro('CNPJ não encontrado.');
+            break;
+          case 429:
+            exibirErro('Limite de requisições excedido. Tente novamente mais tarde.');
+            break;
+          case 500:
+            exibirErro('Erro interno do servidor da ReceitaWS. Tente novamente mais tarde.');
+            break;
+          case 503:
+            exibirErro('Serviço da ReceitaWS indisponível. Tente novamente mais tarde.');
+            break;
+          default:
+            exibirErro(`Erro desconhecido na requisição: ${response.status} - ${response.statusText}`);
         }
         return;
       }
@@ -56,24 +58,19 @@ document.addEventListener('DOMContentLoaded', () => {
         exibirErro(data.message || 'CNPJ não encontrado ou inválido.');
       }
     } catch (error) {
-
-
-      if (error.value=="400")
- {
-  ('Erro 400')
- }
       ocultarLoading();
       console.error('Erro ao consultar a API:', error);
-      exibirErro('Erro ao consultar a API.');
+      exibirErro('Erro ao consultar a API: Verifique sua conexão com a internet e tente novamente.');
     }
   }
 
   function validarCNPJ(cnpj) {
     cnpj = cnpj.replace(/[^\d]+/g, '');
 
-    if (cnpj.length !== 14 || /^(\d)\1+$/.test(cnpj)) {
+    if (cnpj.length !== 14) {
       return false;
     }
+
 
     let tamanho = cnpj.length - 2;
     let numeros = cnpj.substring(0, tamanho);
